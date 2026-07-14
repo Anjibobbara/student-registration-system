@@ -1,0 +1,22 @@
+{
+  "name": "student-registration-system",
+  "version": "1.0.0",
+  "description": "Student Registration System using Node.js, MongoDB and Vercel",
+  "private": true,
+  "scripts": {
+    "dev": "node api/index.js",
+    "start": "node api/index.js"
+  },
+  "dependencies": {
+    "bcrypt": "^6.0.0",
+    "dotenv": "^17.4.2",
+    "jsonwebtoken": "^9.0.3",
+    "mongoose": "^8.15.1"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "devDependencies": {
+    "vercel": "^55.0.0"
+  }
+}
