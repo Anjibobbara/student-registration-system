@@ -12,86 +12,69 @@
 
 </head>
 
-
 <body>
-
 
 <div class="container">
 
+    <div class="top-bar">
 
-<h1>🎓 Admin Dashboard</h1>
+        <h1>🎓 Admin Dashboard</h1>
 
+        <button onclick="logout()" class="logout-btn">
+            Logout
+        </button>
 
+    </div>
 
-<div class="table-card">
+    <div class="card">
 
+        <h2>📋 Registered Students</h2>
 
-<div class="table-header">
+        <input
+        type="text"
+        id="search"
+        placeholder="Search by Name, Reg No or Email"
+        style="margin-bottom:20px;">
 
+        <div class="table-container">
 
-<h2>Registered Students</h2>
+            <table>
 
+                <thead>
 
-<button onclick="logout()">
-Logout
-</button>
+                    <tr>
 
+                        <th>Name</th>
+                        <th>Reg No</th>
+                        <th>Father Name</th>
+                        <th>Mother Name</th>
+                        <th>DOB</th>
+                        <th>Mobile</th>
+                        <th>Alt Mobile</th>
+                        <th>Email</th>
+                        <th>Gender</th>
+                        <th>Courses</th>
+                        <th>Language</th>
+                        <th>Address</th>
+                        <th>Actions</th>
 
-</div>
+                    </tr>
 
+                </thead>
 
+                <tbody id="studentTable">
 
-<input 
-type="text"
-id="search"
-placeholder="Search Student">
+                </tbody>
 
+            </table>
 
-<div class="table-container">
-<table>
+        </div>
 
-
-<thead>
-<tr>
-<th>Name</th>
-<th>Reg No</th>
-<th>Father Name</th>
-<th>Mother Name</th>
-<th>DOB</th>
-<th>Mobile</th>
-<th>Alternative Mobile</th>
-<th>Email</th>
-<th>Gender</th>
-<th>Courses</th>
-<th>Language</th>
-<th>Address</th>
-<th>Photo</th>
-<th>Actions</th>
-</tr>
-
-</thead>
-
-
-
-<tbody id="studentTable">
-
-</tbody>
-
-
-</table>
-</div>
-
+    </div>
 
 </div>
-
-
-</div>
-
-
-
 
 <script src="admin.js"></script>
-
 
 </body>
 

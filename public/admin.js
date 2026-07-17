@@ -1,249 +1,169 @@
-const API_URL = "/api/students";
+const API_URL = "/api";
 
 const token = localStorage.getItem("adminToken");
 
-
-if(!token){
-
+if (!token) {
     alert("Please Login First");
-
-    window.location.href="login.html";
-
+    window.location.href = "login.html";
 }
 
-
-
 const table = document.getElementById("studentTable");
-
 const search = document.getElementById("search");
-
 
 let studentsData = [];
 
 
-
-
 // LOAD STUDENTS
 
-async function loadStudents(){
+async function loadStudents() {
 
+    try {
 
-    try{
-
-
-        const res = await fetch(API_URL,{
-
-            headers:{
-
-                Authorization:`Bearer ${token}`
-
+        const res = await fetch(API_URL, {
+            headers: {
+                Authorization: `Bearer ${token}`
             }
-
         });
 
+        const data = await res.json();
 
+        if (!res.ok) {
+            alert(data.message);
+            return;
+        }
 
-        studentsData = await res.json();
-
+        studentsData = data;
 
         displayStudents(studentsData);
 
-
-
-    }
-    catch(error){
-
-
-        alert("Unable to load students");
-
+    } catch (error) {
 
         console.log(error);
-
+        alert("Unable to load students");
 
     }
 
-
 }
-
-
 
 
 
 // DISPLAY STUDENTS
 
-function displayStudents(students){
+function displayStudents(students) {
 
+    table.innerHTML = "";
 
-    table.innerHTML="";
-
-
-    students.forEach(student=>{
-
+    students.forEach(student => {
 
         table.innerHTML += `
 
-
         <tr>
 
+            <td>${student.name || ""}</td>
 
-        <td data-label="Name">
-        ${student.name}
-        </td>
+            <td>${student.regNo || ""}</td>
 
+            <td>${student.fatherName || ""}</td>
 
-        <td data-label="Email">
-        ${student.email}
-        </td>
+            <td>${student.motherName || ""}</td>
 
+            <td>${student.dob || ""}</td>
 
-        <td data-label="Mobile">
-        ${student.mobile}
-        </td>
+            <td>${student.mobile || ""}</td>
 
+            <td>${student.alternativeMobile || ""}</td>
 
-        <td data-label="Language">
-        ${student.programmingLanguage}
-        </td>
+            <td>${student.email || ""}</td>
 
+            <td>${student.gender || ""}</td>
 
-        <td>
+            <td>${student.courses ? student.courses.join(", ") : ""}</td>
 
+            <td>${student.programmingLanguage || ""}</td>
 
-        <button 
-        class="delete-btn"
-        onclick="deleteStudent('${student._id}')">
+            <td>${student.address || ""}</td>
 
-        Delete
+            <td>
 
-        </button>
+                <button
+                class="delete-btn"
+                onclick="deleteStudent('${student._id}')">
 
+                Delete
 
-        </td>
+                </button>
 
+            </td>
 
         </tr>
 
-
         `;
-
 
     });
 
-
 }
-
-
-
 
 
 
 // DELETE STUDENT
 
+async function deleteStudent(id) {
 
-async function deleteStudent(id){
+    if (!confirm("Delete this student?")) return;
 
+    const res = await fetch(API_URL, {
 
+        method: "DELETE",
 
-    if(!confirm("Delete this student?"))
-
-    return;
-
-
-
-    const res = await fetch(API_URL,{
-
-        method:"DELETE",
-
-        headers:{
-
-            "Content-Type":"application/json",
-
-            Authorization:`Bearer ${token}`
-
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`
         },
 
-
-        body:JSON.stringify({
-
-            id
-
-        })
+        body: JSON.stringify({ id })
 
     });
 
-
-
     const data = await res.json();
-
 
     alert(data.message);
 
-
     loadStudents();
 
-
 }
-
-
-
-
 
 
 
 // SEARCH
 
+search.addEventListener("keyup", () => {
 
-search.addEventListener("keyup",()=>{
+    const value = search.value.toLowerCase();
 
+    const filtered = studentsData.filter(student =>
 
-    const value =
-    search.value.toLowerCase();
-
-
-
-    const filtered =
-    studentsData.filter(student=>
-
-
-        student.name
-        .toLowerCase()
-        .includes(value)
-
+        student.name.toLowerCase().includes(value) ||
+        student.regNo.toLowerCase().includes(value) ||
+        student.email.toLowerCase().includes(value)
 
     );
 
-
-
     displayStudents(filtered);
-
-
 
 });
 
 
 
-
-
-
-
 // LOGOUT
 
-
-function logout(){
-
+function logout() {
 
     localStorage.removeItem("adminToken");
-
     localStorage.removeItem("admin");
 
-
-    window.location.href="login.html";
-
+    window.location.href = "login.html";
 
 }
-
-
-
 
 
 loadStudents();
