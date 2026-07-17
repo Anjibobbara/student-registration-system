@@ -12,7 +12,7 @@ module.exports = async (req, res) => {
     );
     res.setHeader(
         "Access-Control-Allow-Headers",
-        "Content-Type"
+        "Content-Type, Authorization"
     );
 
 
@@ -28,16 +28,17 @@ module.exports = async (req, res) => {
 
         // GET ALL STUDENTS
         if (req.method === "GET") {
-            if(!verifyAdmin(req)){
 
-    return res.status(401).json({
-        message:"Unauthorized Access"
-    });
+            if (!verifyAdmin(req)) {
+                return res.status(401).json({
+                    message: "Unauthorized Access"
+                });
+            }
 
-}
 
             const students = await Student.find()
                 .sort({ createdAt: -1 });
+
 
             return res.status(200).json(students);
         }
@@ -65,6 +66,7 @@ module.exports = async (req, res) => {
             } = req.body;
 
 
+
             const student = await Student.create({
 
                 name,
@@ -85,24 +87,31 @@ module.exports = async (req, res) => {
             });
 
 
+
             return res.status(201).json({
+
                 message: "Student Registered Successfully",
                 student
+
             });
 
         }
 
 
 
+
         // UPDATE STUDENT
         if (req.method === "PUT") {
-            if(!verifyAdmin(req)){
 
-    return res.status(401).json({
-        message:"Unauthorized Access"
-    });
 
-}
+            if (!verifyAdmin(req)) {
+
+                return res.status(401).json({
+                    message: "Unauthorized Access"
+                });
+
+            }
+
 
             const {
                 id,
@@ -121,6 +130,7 @@ module.exports = async (req, res) => {
                 programmingLanguage,
                 photo
             } = req.body;
+
 
 
             const student =
@@ -148,9 +158,12 @@ module.exports = async (req, res) => {
                 );
 
 
+
             return res.status(200).json({
+
                 message: "Student Updated Successfully",
                 student
+
             });
 
         }
@@ -158,15 +171,19 @@ module.exports = async (req, res) => {
 
 
 
+
         // DELETE STUDENT
         if (req.method === "DELETE") {
-            if(!verifyAdmin(req)){
 
-    return res.status(401).json({
-        message:"Unauthorized Access"
-    });
 
-}
+            if (!verifyAdmin(req)) {
+
+                return res.status(401).json({
+                    message: "Unauthorized Access"
+                });
+
+            }
+
 
             const { id } = req.body;
 
@@ -174,36 +191,59 @@ module.exports = async (req, res) => {
             await Student.findByIdAndDelete(id);
 
 
+
             return res.status(200).json({
+
                 message: "Student Deleted Successfully"
+
             });
 
         }
 
 
 
+
+
         return res.status(405).json({
+
             message: "Method Not Allowed"
+
         });
+
 
 
     }
 
     catch (error) {
 
-    console.log(error);
 
-    if (error.code === 11000) {
+        console.log(error);
 
-        return res.status(400).json({
-            message: "This email is already registered."
+
+
+        // Duplicate value error
+        if (error.code === 11000) {
+
+
+            const field = Object.keys(error.keyPattern)[0];
+
+
+            return res.status(400).json({
+
+                message: `${field} already exists`
+
+            });
+
+        }
+
+
+
+        return res.status(500).json({
+
+            message: error.message
+
         });
 
     }
 
-    return res.status(500).json({
-        message: error.message
-    });
-
-}
-}
+};
