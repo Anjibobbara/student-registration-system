@@ -51,11 +51,7 @@ const StudentSchema = new mongoose.Schema(
       trim: true,
     },
 
-    password: {
-      type: String,
-      required: true,
-    },
-
+   
     gender: {
       type: String,
       required: true,
@@ -78,9 +74,7 @@ const StudentSchema = new mongoose.Schema(
       required: true,
     },
 
-    photo: {
-      type: String,
-    },
+  
   },
   {
     timestamps: true,
