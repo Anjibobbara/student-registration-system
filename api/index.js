@@ -191,12 +191,19 @@ module.exports = async (req, res) => {
 
     catch (error) {
 
-        console.log(error);
+    console.log(error);
 
-        return res.status(500).json({
-            message: error.message
+    if (error.code === 11000) {
+
+        return res.status(400).json({
+            message: "This email is already registered."
         });
 
     }
 
-};
+    return res.status(500).json({
+        message: error.message
+    });
+
+}
+}
