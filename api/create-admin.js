@@ -1,6 +1,6 @@
 const connectDB = require("../config/db");
 const Admin = require("../models/Admin");
-const bcrypt = require("bcrypt");
+const bcrypt = require("bcryptjs");
 
 
 module.exports = async (req,res)=>{
