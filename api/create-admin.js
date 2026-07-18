@@ -6,6 +6,18 @@ const bcrypt = require("bcryptjs");
 module.exports = async (req,res)=>{
 
 
+    if(req.method !== "POST"){
+
+        return res.status(405).json({
+
+            message:"Method Not Allowed"
+
+        });
+
+    }
+
+
+
     try{
 
 
@@ -13,22 +25,70 @@ module.exports = async (req,res)=>{
 
 
 
-        const password =
+        const {
+            username,
+            email,
+            password
+        } = req.body;
+
+
+
+        if(!username || !email || !password){
+
+            return res.status(400).json({
+
+                message:"All fields required"
+
+            });
+
+        }
+
+
+
+
+        const existingAdmin =
+        await Admin.findOne({
+
+            email:email.toLowerCase()
+
+        });
+
+
+
+        if(existingAdmin){
+
+            return res.status(400).json({
+
+                message:"Admin already exists"
+
+            });
+
+        }
+
+
+
+
+        const hashedPassword =
         await bcrypt.hash(
-            req.body.password,
+
+            password,
+
             10
+
         );
+
+
 
 
 
         const admin =
         await Admin.create({
 
-            username:req.body.username,
+            username,
 
-            email:req.body.email,
+            email:email.toLowerCase(),
 
-            password,
+            password:hashedPassword,
 
             role:"admin"
 
@@ -36,21 +96,31 @@ module.exports = async (req,res)=>{
 
 
 
-        res.status(201).json({
+
+
+        return res.status(201).json({
 
             message:"Admin Created Successfully",
 
-            admin
+            admin:{
+                username:admin.username,
+                email:admin.email,
+                role:admin.role
+            }
 
         });
 
 
 
     }
+
     catch(error){
 
 
-        res.status(500).json({
+        console.log(error);
+
+
+        return res.status(500).json({
 
             message:error.message
 

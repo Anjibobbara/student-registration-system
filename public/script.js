@@ -1,4 +1,4 @@
-const API_URL = "/api";
+const API_URL = "/api/students";
 
 const studentsSection = document.getElementById("studentsSection");
 const adminToken = localStorage.getItem("adminToken");
@@ -14,32 +14,56 @@ const submitBtn = document.getElementById("submitBtn");
 
 let studentsData = [];
 
+
+// ===============================
 // LOAD STUDENTS
+// ===============================
+
 async function loadStudents() {
 
     try {
 
         const token = localStorage.getItem("adminToken");
 
-        if (!token) return;
+        if (!token || !table) return;
 
-        const res = await fetch(API_URL, {
-            headers: {
-                Authorization: `Bearer ${token}`
-            }
-        });
 
-        studentsData = await res.json();
+       const res = await fetch(API_URL, {
+
+    method,
+
+    headers: {
+
+        "Content-Type":"application/json",
+
+        "Authorization":
+        "Bearer " + localStorage.getItem("adminToken")
+
+    },
+
+    body: JSON.stringify(student)
+
+});
+
+
+        const data = await res.json();
+
 
         if (!res.ok) {
-            throw new Error(studentsData.message);
+
+            throw new Error(data.message);
+
         }
+
+
+        studentsData = data;
 
         displayStudents(studentsData);
 
+
     } catch (err) {
 
-        console.log(err);
+        console.log(err.message);
 
     }
 
@@ -47,12 +71,22 @@ async function loadStudents() {
 
 
 
+
+// ===============================
 // DISPLAY STUDENTS
+// ===============================
+
 function displayStudents(students) {
+
+
+    if (!table) return;
+
 
     table.innerHTML = "";
 
+
     students.forEach(student => {
+
 
         table.innerHTML += `
 
@@ -74,238 +108,482 @@ function displayStudents(students) {
 
             <td>${student.programmingLanguage}</td>
 
+            <td>${student.courses ? student.courses.join(", ") : ""}</td>
+
             <td>${student.address}</td>
 
+
             <td>
+
 
                 <button class="edit-btn"
                 onclick="editStudent('${student._id}')">
 
-                Edit
+                    Edit
 
                 </button>
+
 
                 <button class="delete-btn"
                 onclick="deleteStudent('${student._id}')">
 
-                Delete
+                    Delete
 
                 </button>
 
+
             </td>
+
 
         </tr>
 
         `;
 
+
     });
 
+
 }
+
+
+
+
+// ===============================
 // ADD / UPDATE STUDENT
+// ===============================
+
+
+if (form) {
+
 
 form.addEventListener("submit", async (e) => {
 
+
     e.preventDefault();
+
 
     const id = document.getElementById("studentId").value;
 
+
+
     const courses = [];
 
+
     document
-        .querySelectorAll(".checkbox input:checked")
-        .forEach(item => {
-            courses.push(item.value);
-        });
+    .querySelectorAll(".checkbox input:checked")
+    .forEach(item => {
+
+
+        courses.push(item.value);
+
+
+    });
+
+
 
     const student = {
 
+
         id,
 
-        name: document.getElementById("name").value,
 
-        regNo: document.getElementById("regNo").value,
+        name:
+        document.getElementById("name").value,
 
-        fatherName: document.getElementById("fatherName").value,
 
-        motherName: document.getElementById("motherName").value,
+        regNo:
+        document.getElementById("regNo").value,
 
-        dob: document.getElementById("dob").value,
 
-        mobile: document.getElementById("mobile").value,
+        fatherName:
+        document.getElementById("fatherName").value,
+
+
+        motherName:
+        document.getElementById("motherName").value,
+
+
+        dob:
+        document.getElementById("dob").value,
+
+
+        mobile:
+        document.getElementById("mobile").value,
+
 
         alternativeMobile:
         document.getElementById("alternativeMobile").value,
 
+
         email:
         document.getElementById("email").value,
+
 
         gender:
         document.getElementById("gender").value,
 
-        courses,
 
         address:
         document.getElementById("address").value,
 
+
         programmingLanguage:
         document.getElementById("programmingLanguage").value
 
+
     };
+
+
 
     const method = id ? "PUT" : "POST";
 
+
+
     const res = await fetch(API_URL, {
+
 
         method,
 
+
         headers: {
-            "Content-Type": "application/json"
+
+
+            "Content-Type":"application/json"
+
+
         },
+
 
         body: JSON.stringify(student)
 
+
     });
+
+
 
     const data = await res.json();
 
-    alert(data.message);
 
-    if (res.ok) {
 
-        form.reset();
+    if(!res.ok){
 
-        document.getElementById("studentId").value = "";
+
+        alert(data.message);
+
+
+        return;
+
+
+    }
+
+
+
+    alert("✅ Student Submitted Successfully");
+
+
+
+    form.reset();
+
+
+
+    document.getElementById("studentId").value = "";
+
+
+
+    if(submitBtn){
 
         submitBtn.innerText = "Register Student";
 
-        loadStudents();
-
     }
+
+
+
+    loadStudents();
+
+
+
+    setTimeout(()=>{
+
+
+        window.location.href="success.html";
+
+
+    },1000);
+
+
 
 });
 
 
-
+}
+// ===============================
 // EDIT STUDENT
+// ===============================
 
-function editStudent(id) {
+function editStudent(id){
 
-    const student = studentsData.find(s => s._id === id);
+    const student = studentsData.find(
+        s => s._id === id
+    );
 
-    if (!student) return;
 
-    document.getElementById("studentId").value = id;
+    if(!student){
 
-    document.getElementById("name").value = student.name;
+        alert("Student not found");
+        return;
 
-    document.getElementById("regNo").value = student.regNo;
+    }
 
-    document.getElementById("fatherName").value = student.fatherName;
 
-    document.getElementById("motherName").value = student.motherName;
+    localStorage.setItem(
+        "editStudent",
+        JSON.stringify(student)
+    );
 
-    document.getElementById("dob").value = student.dob;
 
-    document.getElementById("mobile").value = student.mobile;
+    window.location.href = "newform.html";
 
-    document.getElementById("alternativeMobile").value =
-        student.alternativeMobile || "";
+}
 
-    document.getElementById("email").value = student.email;
 
-    document.getElementById("gender").value = student.gender;
 
-    document.getElementById("address").value = student.address;
 
-    document.getElementById("programmingLanguage").value =
-        student.programmingLanguage;
 
-    // Courses
-    document
-        .querySelectorAll(".checkbox input")
-        .forEach(item => {
+// ===============================
+// DELETE STUDENT
+// ===============================
 
-            item.checked =
-                student.courses &&
-                student.courses.includes(item.value);
+
+async function deleteStudent(id){
+
+
+    if(!confirm("Delete this student?")) return;
+
+
+
+    try{
+
+
+        const res = await fetch(API_URL,{
+
+
+            method:"DELETE",
+
+
+            headers:{
+
+
+                "Content-Type":"application/json",
+
+
+                "Authorization":
+                "Bearer " + localStorage.getItem("adminToken")
+
+
+            },
+
+
+            body:JSON.stringify({
+
+                id
+
+            })
+
 
         });
 
-    submitBtn.innerText = "Update Student";
 
-    window.scrollTo({
-        top: 0,
-        behavior: "smooth"
-    });
 
-}
-// DELETE STUDENT
+        const data = await res.json();
 
-async function deleteStudent(id) {
 
-    if (!confirm("Delete this student?")) return;
 
-    const res = await fetch(API_URL, {
+        alert(data.message);
 
-        method: "DELETE",
 
-        headers: {
-            "Content-Type": "application/json",
-            "Authorization": "Bearer " + localStorage.getItem("adminToken")
-        },
 
-        body: JSON.stringify({ id })
+        loadStudents();
 
-    });
 
-    const data = await res.json();
 
-    alert(data.message);
+    }
+    catch(err){
 
-    loadStudents();
+
+        console.log(err);
+
+
+    }
+
 
 }
 
 
 
-// SEARCH
 
-if (search) {
 
-    search.addEventListener("keyup", () => {
 
-        const value = search.value.toLowerCase();
+// ===============================
+// SEARCH STUDENT
+// ===============================
 
-        const filtered = studentsData.filter(student =>
 
-            student.name.toLowerCase().includes(value) ||
-            student.regNo.toLowerCase().includes(value) ||
-            student.email.toLowerCase().includes(value)
+if(search){
+
+
+search.addEventListener("keyup",()=>{
+
+
+    const value =
+    search.value.toLowerCase();
+
+
+
+    const filtered =
+    studentsData.filter(student=>{
+
+
+        return (
+
+        student.name
+        ?.toLowerCase()
+        .includes(value)
+
+
+        ||
+
+        student.regNo
+        ?.toLowerCase()
+        .includes(value)
+
+
+        ||
+
+        student.email
+        ?.toLowerCase()
+        .includes(value)
+
 
         );
 
-        displayStudents(filtered);
 
     });
 
+
+
+    displayStudents(filtered);
+
+
+
+});
+
+
 }
 
 
 
-// LOGOUT
 
-function logout() {
+
+
+// ===============================
+// ADMIN LOGOUT
+// ===============================
+
+
+function logout(){
+
 
     localStorage.removeItem("adminToken");
+
+
     localStorage.removeItem("admin");
 
-    window.location.href = "login.html";
+
+
+    window.location.href="login.html";
+
 
 }
 
 
 
+
+
+
+
+// ===============================
 // INITIAL LOAD
+// ===============================
+
 
 loadStudents();
 
+// ===============================
+// LOAD EDIT DATA INTO FORM
+// ===============================
+
+const editData = localStorage.getItem("editStudent");
+
+if(editData){
+
+    const student = JSON.parse(editData);
+
+
+    document.getElementById("studentId").value =
+    student._id || "";
+
+
+    document.getElementById("name").value =
+    student.name || "";
+
+
+    document.getElementById("regNo").value =
+    student.regNo || "";
+
+
+    document.getElementById("fatherName").value =
+    student.fatherName || "";
+
+
+    document.getElementById("motherName").value =
+    student.motherName || "";
+
+
+    document.getElementById("dob").value =
+    student.dob || "";
+
+
+    document.getElementById("mobile").value =
+    student.mobile || "";
+
+
+    document.getElementById("alternativeMobile").value =
+    student.alternativeMobile || "";
+
+
+    document.getElementById("email").value =
+    student.email || "";
+
+
+    document.getElementById("gender").value =
+    student.gender || "";
+
+
+    document.getElementById("address").value =
+    student.address || "";
+
+
+    document.getElementById("programmingLanguage").value =
+    student.programmingLanguage || "";
+
+
+    if(submitBtn){
+
+        submitBtn.innerText = "Update Student";
+
+    }
+
+
+    localStorage.removeItem("editStudent");
+
+}

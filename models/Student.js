@@ -32,11 +32,11 @@ const StudentSchema = new mongoose.Schema(
       required: true,
     },
 
-    mobile: {
-      type: String,
-      required: true,
-      trim: true,
-    },
+   mobile: {
+      type:String,
+      required:true,
+      match:/^[0-9]{10}$/
+   },
 
     alternativeMobile: {
       type: String,
@@ -69,10 +69,11 @@ const StudentSchema = new mongoose.Schema(
       trim: true,
     },
 
-    programmingLanguage: {
-      type: String,
-      required: true,
-    },
+    programmingLanguage:{
+       type:String,
+       required:true,
+       trim:true
+     }
 
   
   },

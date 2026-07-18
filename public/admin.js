@@ -1,4 +1,4 @@
-const API_URL = "/api";
+const API_URL = "/api/students";
 
 const token = localStorage.getItem("adminToken");
 
@@ -10,12 +10,35 @@ if (!token) {
 const table = document.getElementById("studentTable");
 const search = document.getElementById("search");
 
-let studentsData = [];
+
+
+
+let studentsData = []; 
+
+function editStudent(id){
+
+    const student = studentsData.find(
+        s => s._id === id
+    );
+
+    if(!student) return;
+
+
+    localStorage.setItem(
+        "editStudent",
+        JSON.stringify(student)
+    );
+
+
+    window.location.href = "newform.html";
+
+}
 
 
 // LOAD STUDENTS
 
 async function loadStudents() {
+
 
     try {
 
@@ -77,23 +100,33 @@ function displayStudents(students) {
 
             <td>${student.gender || ""}</td>
 
-            <td>${student.courses ? student.courses.join(", ") : ""}</td>
+            <td>${student.courses && student.courses.length 
+            ? student.courses.join(", ") 
+            : ""}</td>
 
             <td>${student.programmingLanguage || ""}</td>
 
             <td>${student.address || ""}</td>
-
             <td>
 
-                <button
-                class="delete-btn"
-                onclick="deleteStudent('${student._id}')">
+           <button
+           class="edit-btn"
+           onclick="editStudent('${student._id}')">
 
-                Delete
+            Edit
 
-                </button>
+           </button>
 
-            </td>
+
+           <button
+           class="delete-btn"
+           onclick="deleteStudent('${student._id}')">
+
+            Delete
+
+           </button>
+
+              </td>
 
         </tr>
 
@@ -167,3 +200,5 @@ function logout() {
 
 
 loadStudents();
+
+alert("ADMIN JS UPDATED");

@@ -1,249 +1,33 @@
-const connectDB = require("../config/db");
-const Student = require("../models/Student");
-const verifyAdmin = require("../middleware/auth");
+const express = require("express");
+const cors = require("cors");
+
+const app = express();
+
+app.use(cors());
+app.use(express.json());
 
 
-module.exports = async (req, res) => {
+// API ROUTES
 
-    res.setHeader("Access-Control-Allow-Origin", "*");
-    res.setHeader(
-        "Access-Control-Allow-Methods",
-        "GET, POST, PUT, DELETE, OPTIONS"
+app.use("/api/students", require("./students"));
+
+app.use("/api/admin-login", require("./admin-login"));
+
+app.use("/api/create-admin", require("./create-admin"));
+
+
+// FRONTEND
+
+app.use(express.static("public"));
+
+
+const PORT = 3000;
+
+
+app.listen(PORT, ()=>{
+
+    console.log(
+        `Server running on http://localhost:${PORT}`
     );
-    res.setHeader(
-        "Access-Control-Allow-Headers",
-        "Content-Type, Authorization"
-    );
 
-
-    if (req.method === "OPTIONS") {
-        return res.status(200).end();
-    }
-
-
-    try {
-
-        await connectDB();
-
-
-        // GET ALL STUDENTS
-        if (req.method === "GET") {
-
-            if (!verifyAdmin(req)) {
-                return res.status(401).json({
-                    message: "Unauthorized Access"
-                });
-            }
-
-
-            const students = await Student.find()
-                .sort({ createdAt: -1 });
-
-
-            return res.status(200).json(students);
-        }
-
-
-
-        // ADD STUDENT
-        if (req.method === "POST") {
-
-            const {
-                name,
-                regNo,
-                fatherName,
-                motherName,
-                dob,
-                mobile,
-                alternativeMobile,
-                email,
-                password,
-                gender,
-                courses,
-                address,
-                programmingLanguage,
-                photo
-            } = req.body;
-
-
-
-            const student = await Student.create({
-
-                name,
-                regNo,
-                fatherName,
-                motherName,
-                dob,
-                mobile,
-                alternativeMobile,
-                email,
-                password,
-                gender,
-                courses,
-                address,
-                programmingLanguage,
-                photo
-
-            });
-
-
-
-            return res.status(201).json({
-
-                message: "Student Registered Successfully",
-                student
-
-            });
-
-        }
-
-
-
-
-        // UPDATE STUDENT
-        if (req.method === "PUT") {
-
-
-            if (!verifyAdmin(req)) {
-
-                return res.status(401).json({
-                    message: "Unauthorized Access"
-                });
-
-            }
-
-
-            const {
-                id,
-                name,
-                regNo,
-                fatherName,
-                motherName,
-                dob,
-                mobile,
-                alternativeMobile,
-                email,
-                password,
-                gender,
-                courses,
-                address,
-                programmingLanguage,
-                photo
-            } = req.body;
-
-
-
-            const student =
-                await Student.findByIdAndUpdate(
-                    id,
-                    {
-                        name,
-                        regNo,
-                        fatherName,
-                        motherName,
-                        dob,
-                        mobile,
-                        alternativeMobile,
-                        email,
-                        password,
-                        gender,
-                        courses,
-                        address,
-                        programmingLanguage,
-                        photo
-                    },
-                    {
-                        new: true
-                    }
-                );
-
-
-
-            return res.status(200).json({
-
-                message: "Student Updated Successfully",
-                student
-
-            });
-
-        }
-
-
-
-
-
-        // DELETE STUDENT
-        if (req.method === "DELETE") {
-
-
-            if (!verifyAdmin(req)) {
-
-                return res.status(401).json({
-                    message: "Unauthorized Access"
-                });
-
-            }
-
-
-            const { id } = req.body;
-
-
-            await Student.findByIdAndDelete(id);
-
-
-
-            return res.status(200).json({
-
-                message: "Student Deleted Successfully"
-
-            });
-
-        }
-
-
-
-
-
-        return res.status(405).json({
-
-            message: "Method Not Allowed"
-
-        });
-
-
-
-    }
-
-    catch (error) {
-
-
-        console.log(error);
-
-
-
-        // Duplicate value error
-        if (error.code === 11000) {
-
-
-            const field = Object.keys(error.keyPattern)[0];
-
-
-            return res.status(400).json({
-
-                message: `${field} already exists`
-
-            });
-
-        }
-
-
-
-        return res.status(500).json({
-
-            message: error.message
-
-        });
-
-    }
-
-};
+});
